@@ -1,5 +1,7 @@
 import express from 'express';
-import http from 'node:https';
+import https from 'node:https';
+import http from 'node:http';
+import fs from 'node:fs';
 import path from 'node:path';
 import { epoxyPath } from "@mercuryworkshop/epoxy-transport";
 import { baremuxPath } from "@mercuryworkshop/bare-mux/node";
@@ -10,7 +12,10 @@ import chalk from 'chalk';
 import packageJson from './package.json' assert { type: 'json' };
 
 const __dirname = path.resolve();
-const server = http.createServer();
+const server = https.createServer({
+  key: fs.readFileSync('localhost-key.pem'),    // Replace with actual path
+  cert: fs.readFileSync('localhost.pem')       // Replace with actual path
+});
 const bareServer = createBareServer('/bear/');
 const app = express(server);
 const version = packageJson.version;
@@ -67,6 +72,7 @@ server.on("request", (req, res) => {
     bareServer.routeRequest(req, res);
   } else app(req, res);
 });
+
 server.on("upgrade", (req, socket, head) => {
   if (bareServer.shouldRoute(req)) {
     bareServer.routeUpgrade(req, socket, head);
@@ -83,9 +89,8 @@ server.on('listening', () => {
   console.log(chalk.green('  🕒 Time: ') + chalk.bold(new Date().toLocaleTimeString()));
   console.log(chalk.cyan('-----------------------------------------------'));
   console.log(chalk.magenta('📦 Version: ') + chalk.bold(version));
-  console.log(chalk.magenta('🔗 URL: ') + chalk.underline('http://localhost:' + server.address().port));
+  console.log(chalk.magenta('🔗 URL: ') + chalk.underline('https://localhost:' + server.address().port));
   console.log(chalk.cyan('-----------------------------------------------'));
-
 });
 
 function shutdown(signal) {
