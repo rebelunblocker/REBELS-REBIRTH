@@ -1,0 +1,24 @@
+image: node:14  # Node.js image, adjust if needed
+
+pipelines:
+  default:
+    - step:
+        name: Build and Deploy Static Website
+        caches:
+          - node
+        script:
+          # Install dependencies
+          - npm install
+          
+          # Run npm start (this will build the static files, if configured to do so)
+          - npm start   # Assuming npm start generates the static files in the right location
+          
+          # Deploy to S3 (adjust path to your static folder)
+          - pipe: atlassian/aws-s3-deploy:1.0.0
+            variables:
+              AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+              AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+              AWS_REGION: 'us-east-1'  # Adjust if necessary
+              S3_BUCKET: 'your-s3-bucket-name'
+              LOCAL_PATH: './static'  # This is where your built static files should be
+              REMOVE_FLAG: 'true'     # Removes files not in the current deployment
