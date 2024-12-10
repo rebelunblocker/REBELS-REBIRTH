@@ -1,4 +1,4 @@
-image: node:14  # Node.js image, adjust if needed
+image: node:16  # Node.js image, adjust if needed
 
 pipelines:
   default:
