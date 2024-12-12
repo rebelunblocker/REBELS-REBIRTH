@@ -1,5 +1,4 @@
 (function() {
-    var defaultTitle = 'Ezic | V11';
     var defaultIcon = '/assets/img/doge.jpg';
     var storedTitle = localStorage.getItem('tabTitle') || defaultTitle;
     var storedIcon = localStorage.getItem('tabIcon') || defaultIcon;
